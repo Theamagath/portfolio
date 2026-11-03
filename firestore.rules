@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.enabled == true;
+    }
+    match /portfolio/main {
+      allow get: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['profile', 'projects', 'experiences', 'expertise', 'revision'])
+        && request.resource.data.profile is map
+        && request.resource.data.projects is list
+        && request.resource.data.experiences is list
+        && request.resource.data.expertise is list
+        && request.resource.data.revision is int;
+    }
+    match /admins/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}
