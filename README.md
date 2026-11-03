@@ -98,7 +98,9 @@ npm run build
 
 Hasilnya ada di folder **`dist/`**. Bisa diunggah ke Vercel, Netlify, atau hosting statis.
 
-Untuk Vercel: Framework Preset **Other**, Build Command `npm run build`, Output Directory `dist`.
+Untuk Vercel: Framework Preset **Vite**, Build Command `npm run build`, Output Directory `dist`. Konfigurasi ini juga ditetapkan di `vercel.json`.
+
+Jika muncul error `[NEXT_NO_VERSION]`, pastikan Framework Preset di pengaturan proyek Vercel adalah **Vite**. Root Directory harus menunjuk ke folder yang berisi `package.json` dan `vercel.json` (biarkan default jika keduanya berada di root repository), lalu deploy ulang. Proyek ini menggunakan SolidJS + Vite sehingga tidak memerlukan dependency `next`.
 
 ## 8. Struktur folder
 

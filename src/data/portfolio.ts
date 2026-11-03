@@ -41,7 +41,7 @@ export const profile = {
   navbarPhoto: '', // Contoh: '/foto-navbar.jpg'. Kosong = gunakan photo.
   footerPhoto: '', // Contoh: '/foto-footer.jpg'. Kosong = gunakan photo.
   // Taruh file CV di public/cv-saya.pdf, lalu isi resume: '/cv-saya.pdf'.
-  resume: '/ujicoba.pdf', // Tombol Download CV tampil di bagian Kontak setelah diisi.
+  resume: '/yosua%20aremathea%20novantoro-resume.pdf', // Tombol Download CV tampil di bagian Kontak setelah diisi.
   social: [
     { label: 'GitHub', url: 'https://github.com/' },
     { label: 'LinkedIn', url: 'https://www.linkedin.com/in/yosua-nvtr-0a00a9437' },
