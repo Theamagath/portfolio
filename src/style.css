@@ -794,3 +794,19 @@ h2 { font-size: clamp(35px, 4.2vw, 58px); line-height: 1.15; letter-spacing: -2p
 .modal-copy .gallery-viewer footer p{margin:0;color:#cbd0dc;font-size:12px;text-align:center;line-height:1.6}
 @media(max-width:600px){.gallery-heading{align-items:start}.project-gallery .gallery-heading h3{font-size:20px}.gallery-grid{columns:1}.project-gallery .gallery-tile{margin-bottom:18px}.gallery-viewer{width:calc(100vw - 20px);max-height:calc(100dvh - 20px);border-radius:12px}.gallery-viewer-inner{padding:14px}.gallery-viewer-stage{height:62dvh;padding:8px}.gallery-viewer header>div{display:grid;gap:4px}.gallery-viewer header small{max-width:55vw}.gallery-viewer footer{gap:10px}.gallery-viewer button{padding:8px 12px}}
 @media(prefers-reduced-motion:reduce){.gallery-image-button img,.gallery-expand{transition:none}}
+@media(max-width:600px){
+  .modal-backdrop { padding: 8px; }
+  .project-modal { max-height: calc(100dvh - 16px); overscroll-behavior: contain; }
+  .modal-close { position: sticky; display: block; top: 8px; margin: 8px 8px 8px auto; width: 44px; height: 44px; box-shadow: 0 2px 12px #0003; }
+  .modal-copy { padding: 20px 16px; }
+  .modal-copy h2 { font-size: 26px; overflow-wrap: anywhere; }
+  .design-modal-action .button-primary { width: 100%; justify-content: center; min-height: 48px; }
+  .gallery-heading { flex-direction: column; gap: 8px; }
+  .modal-copy .gallery-heading p { max-width: none; }
+  .gallery-expand { width: 44px; height: 44px; }
+  .gallery-viewer-inner { display: flex; flex-direction: column; max-height: calc(100dvh - 24px); overflow-y: auto; }
+  .gallery-viewer header { position: sticky; top: -14px; z-index: 2; background: #10131b; padding-block: 8px; }
+  .gallery-viewer-stage { flex-shrink: 0; height: 55dvh; margin-block: 12px; touch-action: pan-y pinch-zoom; }
+  .gallery-viewer button { min-height: 44px; min-width: 44px; }
+  .gallery-viewer footer p { overflow-wrap: anywhere; min-width: 0; }
+}

@@ -179,6 +179,7 @@ function ProjectCarousel(props: { projects: Project[]; onOpen: (project: Project
 function ProjectGallery(props: { images: NonNullable<Project['gallery']>; title: string; heading?: string }) {
   const [active, setActive] = createSignal(0);
   let viewer!: HTMLDialogElement;
+  let touchStart: { x: number; y: number } | undefined;
   const current = () => props.images[active()];
   const move = (direction: number) => setActive(index => (index + direction + props.images.length) % props.images.length);
   const open = (index: number) => { setActive(index); viewer.showModal(); };
@@ -189,7 +190,7 @@ function ProjectGallery(props: { images: NonNullable<Project['gallery']>; title:
       const [failed, setFailed] = createSignal(false);
       return <figure class="gallery-tile"><button type="button" class="gallery-image-button" onClick={() => open(index())} aria-label={'Perbesar ' + (picture.alt || 'gambar ' + (index()+1))} disabled={failed()}><Show when={!failed()} fallback={<span class="gallery-image-error">Gambar belum tersedia.<br/>Periksa URL gambar di admin.</span>}><img src={picture.src} alt={picture.alt || props.title + ' - gambar ' + (index()+1)} loading="lazy" onError={() => setFailed(true)}/></Show><span class="gallery-image-index">{String(index()+1).padStart(2,'0')}</span><Show when={!failed()}><span class="gallery-expand" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg></span></Show></button><figcaption><span>{picture.alt || 'Visual karya ' + (index()+1)}</span><span aria-hidden="true">{String(index()+1).padStart(2,'0')}</span></figcaption></figure>;
     }}</For></div>
-    <dialog class="gallery-viewer" ref={viewer} aria-label={'Penampil gambar ' + props.title} onClick={event => { if (event.target === viewer) viewer.close(); }} onKeyDown={event => {
+    <dialog class="gallery-viewer" ref={viewer} aria-label={'Penampil gambar ' + props.title} onTouchStart={event => { const touch = event.touches[0]; touchStart = event.touches.length === 1 ? { x: touch.clientX, y: touch.clientY } : undefined; }} onTouchCancel={() => { touchStart = undefined; }} onTouchEnd={event => { const start = touchStart; touchStart = undefined; if (!start || event.touches.length) return; const touch = event.changedTouches[0]; const dx = touch.clientX - start.x; const dy = touch.clientY - start.y; if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5 && props.images.length > 1) move(dx < 0 ? 1 : -1); }} onClick={event => { if (event.target === viewer) viewer.close(); }} onKeyDown={event => {
       if (['Escape','ArrowLeft','ArrowRight'].includes(event.key)) event.stopPropagation();
       if (event.key === 'ArrowLeft') { event.preventDefault(); move(-1); }
       if (event.key === 'ArrowRight') { event.preventDefault(); move(1); }

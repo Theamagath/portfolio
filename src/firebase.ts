@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { doc, getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 const app = initializeApp({
   apiKey: 'AIzaSyCx3QygTeqHbIhWdLEqyHHqPBRt5cuutDM',
@@ -12,4 +13,6 @@ const app = initializeApp({
 });
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const storage = getStorage(app);
+storage.maxUploadRetryTime = 60000;
 export const contentRef = doc(db, 'portfolio', 'main');
