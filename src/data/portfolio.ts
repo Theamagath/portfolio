@@ -126,7 +126,7 @@ export const expertise = [
     number: '02',
     title: 'UI / UX Design',
     desc: 'Menciptakan antarmuka yang menarik dan berfokus pada pengguna.',
-    tags: ['Wireframing', 'Prototyping', 'Figma'],
+    tags: ['Wireframing', 'Prototyping', 'Figma', 'Canva', 'AutoCAD'],
   },
   {
     number: '03',
