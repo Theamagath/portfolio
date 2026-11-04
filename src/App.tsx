@@ -451,6 +451,10 @@ function App() {
               <For each={experienceGroups}>{group => <button type="button" aria-pressed={experienceGroup() === group} aria-controls="journey-browser" onClick={() => { setExperienceGroup(group); setSelectedExperience(''); }}>{group}<span>{experiences.filter(item => item.group === group).length}</span></button>}</For>
             </div>
             <div class="journey-browser" id="journey-browser">
+              <div class="journey-selector">
+              <Show when={visibleExperiences().length > 1}>
+                <div class="journey-scroll-hint"><span>Geser untuk melihat pengalaman lainnya</span><span aria-hidden="true">&larr; &rarr;</span></div>
+              </Show>
               <div class="journey-menu" role="group" aria-label="Pilih pengalaman">
                 <For each={visibleExperiences()}>{(item, index) => (
                   <button type="button" class={currentExperience()?.id === item.id ? 'journey-choice active' : 'journey-choice'} aria-pressed={currentExperience()?.id === item.id} aria-controls="journey-panel" onClick={() => setSelectedExperience(item.id)}>
@@ -459,6 +463,7 @@ function App() {
                     <span class="journey-choice-arrow"><ArrowIcon size={18}/></span>
                   </button>
                 )}</For>
+              </div>
               </div>
               <div class="journey-panel" id="journey-panel" aria-live="polite" aria-atomic="true">
                 <Show when={currentExperience()} keyed fallback={<p class="experience-group-empty">Belum ada pengalaman {experienceGroup().toLowerCase()} yang ditambahkan.</p>}>{(item) => <div class="journey-story">

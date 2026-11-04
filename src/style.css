@@ -701,6 +701,8 @@ h2 { font-size: clamp(35px, 4.2vw, 58px); line-height: 1.15; letter-spacing: -2p
 
 /* Experience selector: editorial list beside one focused story. */
 .journey-browser { display: grid; grid-template-columns: .85fr 1.3fr; gap: 48px; align-items: start; }
+.journey-selector { min-width: 0; }
+.journey-scroll-hint { display: none; }
 .journey-menu { display: grid; border-top: 1px solid var(--line); }
 .journey-choice { position: relative; display: flex; align-items: center; gap: 16px; width: 100%; padding: 24px 14px; border: 0; border-bottom: 1px solid var(--line); background: transparent; text-align: left; border-radius: 0; }
 .journey-choice::before { content: ''; position: absolute; top: 22px; bottom: 22px; left: 0; width: 3px; border-radius: 3px; background: linear-gradient(#39bfd7, #a871da, #de2d91); opacity: 0; }
@@ -728,7 +730,12 @@ h2 { font-size: clamp(35px, 4.2vw, 58px); line-height: 1.15; letter-spacing: -2p
 .journey-actions .carousel-detail { margin: 0; }
 @media (max-width: 760px) {
   .journey-browser { grid-template-columns: 1fr; gap: 24px; }
-  .journey-menu { display: flex; overflow-x: auto; scroll-snap-type: x proximity; border-top: 0; padding-bottom: 8px; }
+  .journey-scroll-hint { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--accent); font-size: 11px; line-height: 1.6; }
+  .journey-scroll-hint > span:last-child { flex-shrink: 0; font-size: 20px; letter-spacing: 4px; }
+  .journey-menu { display: flex; overflow-x: auto; scroll-snap-type: x proximity; border-top: 0; padding-bottom: 12px; scrollbar-width: thin; scrollbar-color: var(--accent) var(--surface); }
+  .journey-menu::-webkit-scrollbar { height: 5px; }
+  .journey-menu::-webkit-scrollbar-track { background: var(--surface); }
+  .journey-menu::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 5px; }
   .journey-choice { flex: 0 0 210px; padding: 16px 12px; scroll-snap-align: start; gap: 10px; border-top: 1px solid var(--line); }
   .journey-choice::before { top: auto; bottom: 0; left: 12px; right: 12px; width: auto; height: 2px; }
   .journey-choice-arrow { display: none; }
