@@ -700,6 +700,15 @@ h2 { font-size: clamp(35px, 4.2vw, 58px); line-height: 1.15; letter-spacing: -2p
 @media (prefers-reduced-motion: reduce) { .experience-card { transition: none; } }
 
 /* Experience selector: editorial list beside one focused story. */
+.work-scroll-hint { display: none; }
+@media(max-width:600px){
+  .work-scroll-hint { display: flex; justify-content: center; align-items: center; gap: 10px; margin: 0 22px 16px; color: var(--accent); font-size: 11px; line-height: 1.6; text-align: center; }
+  .work-scroll-hint span { flex-shrink: 0; font-size: 20px; }
+  .carousel-shell { touch-action: auto; cursor: auto; }
+  .carousel-shell .carousel-stage { display: flex; align-items: center; gap: 14px; height: auto; padding: 12px 11vw 20px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 11vw; scrollbar-width: thin; scrollbar-color: var(--accent) var(--surface); }
+  .carousel-shell .carousel-slide { position: relative; inset: auto; flex: 0 0 78vw; width: 78vw; transform: none; translate: none; opacity: 1 !important; scroll-snap-align: center; transition: border-color .2s; }
+  .carousel-controls button { width: 44px; height: 44px; }
+}
 .design-link-action { display: flex; justify-content: center; margin: 0 22px 24px; }
 .design-modal-action { margin: 24px 0; }
 .design-link-action .button-primary:disabled { opacity: .55; cursor: default; }

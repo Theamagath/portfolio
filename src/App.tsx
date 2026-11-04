@@ -90,12 +90,27 @@ function VisualCard(props: { project: Project }) {
 function ProjectCarousel(props: { projects: Project[]; onOpen: (project: Project) => void }) {
   const [active, setActive] = createSignal(0);
   const [dragX, setDragX] = createSignal(0);
+  const [mobile, setMobile] = createSignal(false);
+  let stage!: HTMLDivElement;
+  const select = (index: number) => {
+    setActive(index);
+    if (mobile() && stage) {
+      const slide = stage.children[index] as HTMLElement | undefined;
+      if (slide) stage.scrollTo({ left: slide.offsetLeft - (stage.clientWidth - slide.offsetWidth) / 2, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    }
+  };
+  onMount(() => {
+    const query = window.matchMedia('(max-width: 600px)');
+    const update = () => { setMobile(query.matches); queueMicrotask(() => { if (stage) stage.scrollLeft = 0; setActive(0); }); };
+    update(); query.addEventListener('change', update);
+    onCleanup(() => query.removeEventListener('change', update));
+  });
   let gesture: { x: number; y: number; captured: boolean } | undefined;
   let suppressClickUntil = 0;
   const current = createMemo(() => props.projects[active()]);
-  createEffect(() => { props.projects; setActive(0); setDragX(0); });
+  createEffect(() => { props.projects; setActive(0); setDragX(0); queueMicrotask(() => { if (stage) stage.scrollLeft = 0; }); });
   const move = (direction: number) => {
-    if (props.projects.length) setActive((index) => (index + direction + props.projects.length) % props.projects.length);
+    if (props.projects.length) select((active() + direction + props.projects.length) % props.projects.length);
   };
   const offset = (index: number) => {
     const count = props.projects.length;
@@ -119,6 +134,7 @@ function ProjectCarousel(props: { projects: Project[]; onOpen: (project: Project
   };
   return (
     <div class="project-carousel">
+      <Show when={props.projects.length > 1}><p class="work-scroll-hint">Geser kiri atau kanan untuk melihat karya lainnya <span aria-hidden="true">&larr; &rarr;</span></p></Show>
       <Show when={current()} keyed>{project => <Show when={project.category === 'Desain Grafis'}><div class="design-link-action"><Show when={project.link} fallback={<button type="button" class="button-primary" disabled>Lihat semua desain <ArrowIcon diagonal size={16}/></button>}><a class="button-primary" href={project.link} target="_blank" rel="noopener noreferrer">Lihat semua desain <ArrowIcon diagonal size={16}/></a></Show></div></Show>}</Show>
       <div class={`carousel-shell ${dragX() ? 'dragging' : ''}`} role="region" aria-roledescription="carousel" aria-label="Galeri proyek. Geser atau gunakan tombol panah." tabIndex={0}
         style={{ '--drag-x': `${dragX()}px` }}
@@ -128,6 +144,7 @@ function ProjectCarousel(props: { projects: Project[]; onOpen: (project: Project
           }
         }}
         onPointerDown={(event) => {
+          if (mobile()) return;
           if (event.pointerType === 'mouse' && event.button !== 0) return;
           gesture = { x: event.clientX, y: event.clientY, captured: false };
         }}
@@ -144,7 +161,13 @@ function ProjectCarousel(props: { projects: Project[]; onOpen: (project: Project
         onPointerUp={(event) => finishDrag(event)}
         onPointerCancel={(event) => finishDrag(event, true)}
         onLostPointerCapture={() => { gesture = undefined; setDragX(0); }}>
-        <div class="carousel-stage">
+        <div class="carousel-stage" ref={stage} onScroll={() => {
+          if (!mobile() || !stage.children.length) return;
+          const center = stage.scrollLeft + stage.clientWidth / 2;
+          let nearest = 0, distance = Infinity;
+          Array.from(stage.children).forEach((element, index) => { const slide = element as HTMLElement; const delta = Math.abs(slide.offsetLeft + slide.offsetWidth / 2 - center); if (delta < distance) { distance = delta; nearest = index; } });
+          setActive(nearest);
+        }}>
           <For each={props.projects}>{(project, index) => (
             <button type="button" class={`carousel-slide ${offset(index()) === 0 ? 'selected' : ''}`}
               style={{ '--position': offset(index()), '--scale': Math.max(.55, 1 - Math.abs(offset(index())) * .22), opacity: Math.max(.12, 1 - Math.abs(offset(index())) * .3), 'z-index': 10 - Math.abs(offset(index())) }}
@@ -152,7 +175,7 @@ function ProjectCarousel(props: { projects: Project[]; onOpen: (project: Project
               aria-label={offset(index()) === 0 ? `Lihat detail ${project.title}` : `Pilih proyek ${project.title}`}
               onClick={() => {
                 if (Date.now() < suppressClickUntil) return;
-                if (index() === active()) props.onOpen(project); else setActive(index());
+                if (index() === active()) props.onOpen(project); else select(index());
               }}>
               <VisualCard project={project} />
               <span class="carousel-open-icon"><ArrowIcon diagonal size={19} /></span>
