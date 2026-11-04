@@ -1,8 +1,7 @@
 import { For, Index, Show, createSignal, onCleanup, untrack, createContext, useContext } from 'solid-js';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from 'firebase/auth';
 import { doc, getDoc, runTransaction } from 'firebase/firestore';
-import { getDownloadURL, ref, uploadBytesResumable, type UploadTask } from 'firebase/storage';
-import { auth, db, contentRef, storage } from './firebase';
+import { auth, db, contentRef } from './firebase';
 import { contentSchema, defaults, type Content } from './data/content';
 import './admin.css';
 import { experienceGroups } from './data/experience';
@@ -43,50 +42,6 @@ const hints: Record<string, string> = {
 const collectionNames: Record<string, string> = { projects: 'karya', experiences: 'pengalaman', expertise: 'kelompok keahlian', social: 'media sosial', gallery: 'gambar', stack: 'teknologi', tags: 'keahlian', highlights: 'poin' };
 const longFields = ['description', 'about', 'aboutSecond', 'shortBio', 'summary', 'desc'];
 const EditorActivity = createContext<(delta: number) => void>(() => {});
-
-function ImageUpload(props: { value: string; change: (url: string) => void }) {
-  const activity = useContext(EditorActivity);
-  const [uploading, setUploading] = createSignal(false);
-  const [progress, setProgress] = createSignal(0);
-  const [message, setMessage] = createSignal('');
-  let task: UploadTask | undefined;
-  let disposed = false;
-  let active = false;
-  const release = () => { if (active) { active = false; activity(-1); } };
-  onCleanup(() => { disposed = true; task?.cancel(); release(); });
-  const upload = async (file: File) => {
-    if (uploading()) return;
-    setMessage('');
-    if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) { setMessage('Pilih JPG, PNG, WebP, atau GIF.'); return; }
-    if (!file.size || file.size > 5 * 1024 * 1024) { setMessage('Ukuran gambar maksimal 5 MB.'); return; }
-    const user = auth.currentUser;
-    if (!user) { setMessage('Login admin terlebih dahulu.'); return; }
-    active = true; activity(1); setUploading(true); setProgress(0);
-    let stalled = false;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    try {
-      const extension = ({ 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' } as Record<string, string>)[file.type];
-      task = uploadBytesResumable(ref(storage, `portfolio/${user.uid}/${crypto.randomUUID()}.${extension}`), file, { contentType: file.type });
-      timer = setTimeout(() => { stalled = true; task?.cancel(); }, 30000);
-      task.on('state_changed', snapshot => { if (snapshot.bytesTransferred > 0) clearTimeout(timer); if (!disposed) setProgress(Math.round(snapshot.bytesTransferred / snapshot.totalBytes * 100)); });
-      const result = await task;
-      const url = await getDownloadURL(result.ref);
-      if (!disposed) { props.change(url); setMessage('Upload selesai. Simpan draf lalu Simpan & terbitkan agar tampil di website.'); }
-    } catch (error) {
-      if (!disposed) {
-        const code = (error as { code?: string }).code;
-        setMessage(stalled ? 'Upload tidak mulai dalam 30 detik. Periksa koneksi, aktifkan Firebase Storage, dan pastikan nama bucket sesuai src/firebase.ts.' : code === 'storage/unauthorized' ? 'Upload ditolak. Periksa Storage Rules dan akses admin.' : code === 'storage/bucket-not-found' || code === 'storage/project-not-found' ? 'Bucket Storage belum tersedia. Buat bucket di Firebase Console dan cocokkan namanya dengan src/firebase.ts.' : code === 'storage/canceled' ? 'Upload dibatalkan.' : `Upload gagal (${code || 'koneksi'}). Periksa Firebase Storage, nama bucket, dan Storage Rules.`);
-      }
-    } finally { clearTimeout(timer); task = undefined; release(); if (!disposed) setUploading(false); }
-  };
-  return <span class="cms-upload">
-    <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" aria-label="Upload gambar" disabled={uploading()} onChange={event => { const file = event.currentTarget.files?.[0]; event.currentTarget.value = ''; if (file) void upload(file); }}/>
-    <small>Upload JPG, PNG, WebP, atau GIF, maksimal 5 MB.</small>
-    <Show when={uploading()}><span role="status">Mengunggah {progress()}%</span><progress value={progress()} max="100"/><button type="button" onClick={event => { event.preventDefault(); task?.cancel(); }}>Batalkan upload</button></Show>
-    <Show when={message()}><span role="status">{message()}</span></Show>
-    <Show when={props.value}><img class="cms-upload-preview" src={props.value} alt="Pratinjau gambar" loading="lazy"/></Show>
-  </span>;
-}
 
 function CollectionEditor(props: { name: string; value: unknown[]; change: (value: unknown[]) => void }) {
   const activity = useContext(EditorActivity);
@@ -142,7 +97,6 @@ function Field(props: { name: string; value: unknown; change: (v: any) => void }
           </Show>
         }><select value={String(props.value)} onChange={e => props.change(e.currentTarget.value)}><For each={props.name === 'group' ? [...experienceGroups] : props.name === 'visual' ? ['website', 'dashboard', 'mobile', 'branding', 'analytics'] : ['Web App', 'UI/UX', 'Desain Grafis', 'Publikasi']}>{v => <option>{v}</option>}</For></select></Show>
         <Show when={hints[props.name]}><small>{hints[props.name]}</small></Show>
-        <Show when={['photo', 'introPhoto', 'aboutPhoto', 'navbarPhoto', 'footerPhoto', 'image', 'src'].includes(props.name)}><ImageUpload value={String(props.value ?? '')} change={props.change}/></Show>
       </label>
     }><div class="cms-grid"><For each={basicKeys()}>{key => <Field name={key} value={object()[key]} change={next => updateKey(key, next)} />}</For>
       <Show when={advancedKeys().length}><details class="cms-advanced"><summary>Pengaturan tambahan <span>ID, ilustrasi, atau foto per bagian</span></summary><div class="cms-grid"><For each={advancedKeys()}>{key => <Field name={key} value={object()[key]} change={next => updateKey(key, next)} />}</For></div></details></Show>
@@ -218,7 +172,7 @@ export default function Admin() {
         <div class="cms-account"><span>{user()?.email}</span><button disabled={busy() || openEditors() > 0} onClick={async () => { if (dirty() && !confirm('Keluar dan buang draf yang belum disimpan?')) return; try { await signOut(auth); setDirty(false); setMessage(''); } catch (e) { error(e); } }}>Keluar</button></div>
         <Show when={allowed()} fallback={<p>Akun ini belum memiliki akses admin. Daftarkan UID <code>{user()?.uid}</code> melalui Firebase Console.</p>}>
           <div class="cms-toolbar"><div class="cms-save-state"><span classList={{ 'cms-state-dot': true, 'is-dirty': dirty() }}/><div><strong>{dirty() ? 'Perubahan belum disimpan' : 'Konten siap diedit'}</strong><small>{openEditors() > 0 ? 'Selesaikan formulir: Simpan item ke draf atau Batal.' : dirty() ? 'Simpan agar perubahan tampil di portofolio.' : 'Pilih item di bawah untuk mulai mengedit.'}</small></div></div><div class="cms-save-actions"><button disabled={busy() || openEditors() > 0} onClick={() => { if (!dirty() || confirm('Buang draf dan muat ulang konten?')) void load(); }}>Muat ulang</button><button class="cms-publish" disabled={busy() || !loaded() || openEditors() > 0} onClick={save}>{busy() ? 'Memproses...' : 'Simpan & terbitkan'}</button></div></div>
-          <Show when={loaded()}><div class="cms-section-note"><strong>{tab() === 'profile' ? 'Informasi yang tampil di website' : 'Daftar ' + sections[tab()].title.toLowerCase()}</strong><p>{tab() === 'profile' ? 'Isi identitas dan kontakmu. Foto tambahan boleh dikosongkan untuk memakai foto utama.' : 'Klik Tambah atau Edit untuk membuka formulir satu item. Simpan item ke draf, lalu Simpan & terbitkan untuk memperbarui website.'}</p><small>Untuk gambar, pilih file untuk upload atau tempel URL. Setelah upload, simpan item ke draf lalu Simpan & terbitkan. Untuk CV, gunakan URL atau path file publik.</small></div><fieldset disabled={busy()} class="cms-editor"><Field name={tab()} value={draft()[tab()]} change={value => { setDraft(previous => ({ ...previous, [tab()]: value })); setDirty(true); }} /></fieldset><div class="cms-bottom-save"><div><strong>{dirty() ? 'Selesai menambahkan atau mengedit?' : 'Tidak ada perubahan yang belum disimpan.'}</strong><p>{openEditors() > 0 ? 'Klik Simpan item ke draf pada formulir terlebih dahulu.' : 'Simpan semua perubahan untuk menampilkannya di portofolio.'}</p></div><button type="button" class="cms-publish" disabled={busy() || !loaded() || !dirty() || openEditors() > 0} onClick={save}>{busy() ? 'Menyimpan...' : 'Simpan & terbitkan'}</button><Show when={message()}><p class="cms-bottom-message" role="status">{message()}</p></Show></div></Show>
+          <Show when={loaded()}><div class="cms-section-note"><strong>{tab() === 'profile' ? 'Informasi yang tampil di website' : 'Daftar ' + sections[tab()].title.toLowerCase()}</strong><p>{tab() === 'profile' ? 'Isi identitas dan kontakmu. Foto tambahan boleh dikosongkan untuk memakai foto utama.' : 'Klik Tambah atau Edit untuk membuka formulir satu item. Simpan item ke draf, lalu Simpan & terbitkan untuk memperbarui website.'}</p><small>Untuk gambar dan CV, tempel URL publik atau path seperti /foto.jpg. File lokal harus berada di folder public dan ikut deploy. Setelah mengubah alamat, simpan dan terbitkan.</small></div><fieldset disabled={busy()} class="cms-editor"><Field name={tab()} value={draft()[tab()]} change={value => { setDraft(previous => ({ ...previous, [tab()]: value })); setDirty(true); }} /></fieldset><div class="cms-bottom-save"><div><strong>{dirty() ? 'Selesai menambahkan atau mengedit?' : 'Tidak ada perubahan yang belum disimpan.'}</strong><p>{openEditors() > 0 ? 'Klik Simpan item ke draf pada formulir terlebih dahulu.' : 'Simpan semua perubahan untuk menampilkannya di portofolio.'}</p></div><button type="button" class="cms-publish" disabled={busy() || !loaded() || !dirty() || openEditors() > 0} onClick={save}>{busy() ? 'Menyimpan...' : 'Simpan & terbitkan'}</button><Show when={message()}><p class="cms-bottom-message" role="status">{message()}</p></Show></div></Show>
         </Show>
       </Show>
     </Show>
