@@ -803,6 +803,18 @@ h2 { font-size: clamp(35px, 4.2vw, 58px); line-height: 1.15; letter-spacing: -2p
 .modal-copy .gallery-viewer footer p{margin:0;color:#cbd0dc;font-size:12px;text-align:center;line-height:1.6}
 @media(max-width:600px){.gallery-heading{align-items:start}.project-gallery .gallery-heading h3{font-size:20px}.gallery-grid{columns:1}.project-gallery .gallery-tile{margin-bottom:18px}.gallery-viewer{width:calc(100vw - 20px);max-height:calc(100dvh - 20px);border-radius:12px}.gallery-viewer-inner{padding:14px}.gallery-viewer-stage{height:62dvh;padding:8px}.gallery-viewer header>div{display:grid;gap:4px}.gallery-viewer header small{max-width:55vw}.gallery-viewer footer{gap:10px}.gallery-viewer button{padding:8px 12px}}
 @media(prefers-reduced-motion:reduce){.gallery-image-button img,.gallery-expand{transition:none}}
+/* Simple, consistent portrait frames. */
+.hero-right .portrait-frame,
+.about-photo-frame {
+  border-radius: 24px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: 0 12px 32px #00000012;
+  overflow: hidden;
+  transform: none;
+  animation: none;
+}
+.about-photo-wrap { padding: 0; }
 @media(max-width:600px){
   .modal-backdrop { padding: 8px; }
   .project-modal { max-height: calc(100dvh - 16px); overscroll-behavior: contain; }

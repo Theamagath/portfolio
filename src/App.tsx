@@ -386,7 +386,7 @@ function App() {
       <main>
         <section class="hero section-container" aria-labelledby="hero-title">
           <div class="hero-left"><div class="eyebrow"><span class="status-pulse"/> OPEN TO NEW OPPORTUNITIES <span class="eyebrow-line"/></div><p class="hero-hello">HALO, SAYA</p><h1 id="hero-title"><span class="hero-name">{profile.name}<span class="hero-period">.</span></span></h1><div class="hero-position"><span>↗</span><strong>{profile.role}</strong></div><p class="hero-bio">{profile.shortBio}</p><div class="hero-buttons"><a href="#work" class="button-primary">Lihat Karya <ArrowIcon diagonal /></a><a class="button-text" href="#about">Kenali saya <ArrowIcon /></a></div><div class="hero-divider"/><div class="hero-bottom"><span>BASED IN<br/><b>{profile.location}</b></span><span>CURRENT FOCUS<br/><b>Building better digital things</b></span><span class="hero-scroll">SCROLL TO EXPLORE <span>↓</span></span></div></div>
-          <div class="hero-right"><div class="portrait-frame"><div class="portrait-decor decor-one"/><div class="portrait-decor decor-two"/><div class="portrait-grid"/><Show when={profile.introPhoto || profile.photo} fallback={<div class="portrait-placeholder"><span class="portrait-sun">✳</span><div class="portrait-avatar"><span class="avatar-head"/><span class="avatar-body"/></div><span class="portrait-empty-label">YOUR PHOTO HERE</span></div>}><div class="profile-image-crop"><img class="profile-image" src={profile.introPhoto || profile.photo} alt={`Foto profil ${profile.name}`}/></div></Show><div class="portrait-sticker"><span>✳</span> <b>LET'S MAKE<br/>IT HAPPEN</b></div></div><div class="photo-caption"><span><span class="caption-dot" /> NICE TO MEET YOU.</span><span>01 / INTRO</span></div></div>
+          <div class="hero-right"><div class="portrait-frame"><Show when={profile.introPhoto || profile.photo} fallback={<div class="portrait-placeholder"><span class="portrait-sun">✳</span><div class="portrait-avatar"><span class="avatar-head"/><span class="avatar-body"/></div><span class="portrait-empty-label">YOUR PHOTO HERE</span></div>}><div class="profile-image-crop"><img class="profile-image" src={profile.introPhoto || profile.photo} alt={`Foto profil ${profile.name}`}/></div></Show></div><div class="photo-caption"><span><span class="caption-dot" /> NICE TO MEET YOU.</span><span>01 / INTRO</span></div></div>
         </section>
 
         <section class="work-section" id="work" aria-labelledby="work-title">
@@ -411,13 +411,13 @@ function App() {
           <div class="section-container about-profile-layout">
             <div class="about-photo-column">
               <div class="about-photo-wrap">
-                <div class="about-photo-halo" aria-hidden="true" />
+                
                 <div class="about-photo-frame">
                   <Show when={profile.aboutPhoto || profile.photo} fallback={<div class="about-photo-placeholder"><span class="about-photo-initials">{profile.shortName}</span><span>RUANG UNTUK FOTO SAYA</span></div>}>
                     <img class="about-profile-image" src={profile.aboutPhoto || profile.photo} alt={'Foto profil ' + profile.name} loading="lazy" />
                   </Show>
                 </div>
-                <div class="about-photo-note"><span aria-hidden="true">✳</span><span>STILL CURIOUS.<br/><b>ALWAYS LEARNING.</b></span></div>
+                
               </div>
               <div class="about-identity"><div><h3>{profile.name}</h3><p>{profile.role}</p></div><span class="about-location">{profile.location}</span></div>
             </div>
