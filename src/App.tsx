@@ -119,6 +119,7 @@ function ProjectCarousel(props: { projects: Project[]; onOpen: (project: Project
   };
   return (
     <div class="project-carousel">
+      <Show when={current()} keyed>{project => <Show when={project.category === 'Desain Grafis'}><div class="design-link-action"><Show when={project.link} fallback={<button type="button" class="button-primary" disabled>Lihat semua desain <ArrowIcon diagonal size={16}/></button>}><a class="button-primary" href={project.link} target="_blank" rel="noopener noreferrer">Lihat semua desain <ArrowIcon diagonal size={16}/></a></Show></div></Show>}</Show>
       <div class={`carousel-shell ${dragX() ? 'dragging' : ''}`} role="region" aria-roledescription="carousel" aria-label="Galeri proyek. Geser atau gunakan tombol panah." tabIndex={0}
         style={{ '--drag-x': `${dragX()}px` }}
         onKeyDown={(event) => {
@@ -169,7 +170,6 @@ function ProjectCarousel(props: { projects: Project[]; onOpen: (project: Project
           <div class="project-meta">{project.category}{project.year ? ' · ' + project.year : ''}</div>
           <h3>{project.title}</h3><p>{project.summary}</p>
           <button type="button" class="carousel-detail" onClick={() => props.onOpen(project)}>Lihat detail proyek <ArrowIcon diagonal size={16} /></button>
-          <Show when={project.category === 'Desain Grafis'}><div class="design-link-action"><Show when={project.link} fallback={<button type="button" class="button-primary" disabled>Lihat semua desain <ArrowIcon diagonal size={16}/></button>}><a class="button-primary" href={project.link} target="_blank" rel="noopener noreferrer">Lihat semua desain <ArrowIcon diagonal size={16}/></a></Show></div></Show>
         </>}</Show>
       </div>
     </div>
