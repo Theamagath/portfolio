@@ -701,6 +701,7 @@ h2 { font-size: clamp(35px, 4.2vw, 58px); line-height: 1.15; letter-spacing: -2p
 
 /* Experience selector: editorial list beside one focused story. */
 .design-link-action { display: flex; justify-content: center; margin: 0 22px 24px; }
+.design-modal-action { margin: 24px 0; }
 .design-link-action .button-primary:disabled { opacity: .55; cursor: default; }
 .journey-browser { display: grid; grid-template-columns: .85fr 1.3fr; gap: 48px; align-items: start; }
 .journey-selector { min-width: 0; }
