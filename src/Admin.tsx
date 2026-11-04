@@ -26,6 +26,7 @@ const hints: Record<string, string> = {
   photo: 'Contoh: /foto-saya.jpg atau https://contoh.com/foto.jpg',
   resume: 'Tautan file PDF untuk tombol unduh CV. Boleh dikosongkan.',
   image: 'Tautan gambar utama karya. Boleh dikosongkan.',
+  link: 'Untuk karya Desain Grafis, isi URL Figma di sini untuk mengaktifkan tombol Lihat semua desain.',
   introPhoto: 'Opsional. Kosongkan untuk memakai foto utama.',
   aboutPhoto: 'Opsional. Kosongkan untuk memakai foto utama.',
   navbarPhoto: 'Opsional. Kosongkan untuk memakai foto utama.',

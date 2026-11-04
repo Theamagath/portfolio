@@ -700,6 +700,8 @@ h2 { font-size: clamp(35px, 4.2vw, 58px); line-height: 1.15; letter-spacing: -2p
 @media (prefers-reduced-motion: reduce) { .experience-card { transition: none; } }
 
 /* Experience selector: editorial list beside one focused story. */
+.design-link-action { margin-top: 18px; }
+.design-link-action .button-primary:disabled { opacity: .55; cursor: default; }
 .journey-browser { display: grid; grid-template-columns: .85fr 1.3fr; gap: 48px; align-items: start; }
 .journey-selector { min-width: 0; }
 .journey-scroll-hint { display: none; }
