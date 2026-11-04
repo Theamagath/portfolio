@@ -161,8 +161,8 @@ export const projects: Project[] = [
     image: '', // Simpan foto di public/karya-divisi.jpg, lalu isi '/karya-divisi.jpg'.
     category: 'Web App',
     year: '',
-    summary: 'Proyek website Rekomendasi Divisi.',
-    description: 'Karya pengembangan website Rekomendasi Divisi. Kunjungi website untuk menjelajahi proyek secara langsung.',
+    summary: 'Website rekomendasi penempatan divisi magang berdasarkan profil peserta.',
+    description: 'Website untuk membantu proses penempatan divisi magang dengan mempertimbangkan program studi, minat, dan keahlian peserta. Proyek ini berkaitan dengan penelitian Content-Based Filtering pada publikasi saya. Buka demo untuk menjelajahi alur dan tampilan aplikasinya.',
     stack: [],
     visual: 'website',
     link: 'https://rekomendasidivisi.vercel.app/',
@@ -236,7 +236,7 @@ export const projects: Project[] = [
     category: 'Desain Grafis',
     year: '',
     summary: 'Kumpulan karya desain grafis untuk bidang usaha teknologi Nexty Labs.',
-    description: 'Karya desain grafis yang saya buat saat berkontribusi di Nexty Labs pada bidang desain grafis dan marketing. Galeri ini mengumpulkan desain untuk konteks usaha teknologi.',
+    description: 'Kumpulan materi visual yang saya buat dalam kontribusi desain grafis dan marketing di Nexty Labs. Karya ditujukan untuk komunikasi usaha teknologi. Galeri menampilkan contoh hasil desain; tautan Figma menyediakan koleksi selengkapnya jika tersedia.',
     stack: [], // Isi alat desain yang kamu gunakan.
     visual: 'website',
     image: '', // Contoh: '/desain/nexty/sampul.jpg'. Simpan file di public/desain/nexty/.
@@ -251,7 +251,7 @@ export const projects: Project[] = [
     category: 'Desain Grafis',
     year: '',
     summary: 'Kumpulan karya desain grafis untuk bidang usaha konstruksi Lunar Konstruksi.',
-    description: 'Karya desain grafis yang saya buat untuk Lunar Konstruksi. Galeri ini dikelompokkan terpisah dari Nexty Labs agar konteks bidang usaha konstruksi lebih jelas, meskipun keduanya berada di bawah CV yang sama.',
+    description: 'Kumpulan karya desain grafis yang saya buat untuk Lunar Konstruksi, dengan konteks komunikasi usaha di bidang konstruksi. Galeri menampilkan contoh hasil desain; tautan Figma menyediakan koleksi selengkapnya jika tersedia.',
     stack: [], // Isi alat desain yang kamu gunakan.
     visual: 'website',
     image: '', // Contoh: '/desain/lunar/sampul.jpg'. Simpan file di public/desain/lunar/.
