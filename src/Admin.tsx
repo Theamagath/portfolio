@@ -55,25 +55,29 @@ function ImageUpload(props: { value: string; change: (url: string) => void }) {
   const release = () => { if (active) { active = false; activity(-1); } };
   onCleanup(() => { disposed = true; task?.cancel(); release(); });
   const upload = async (file: File) => {
+    if (uploading()) return;
     setMessage('');
     if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) { setMessage('Pilih JPG, PNG, WebP, atau GIF.'); return; }
     if (!file.size || file.size > 5 * 1024 * 1024) { setMessage('Ukuran gambar maksimal 5 MB.'); return; }
     const user = auth.currentUser;
     if (!user) { setMessage('Login admin terlebih dahulu.'); return; }
     active = true; activity(1); setUploading(true); setProgress(0);
+    let stalled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     try {
       const extension = ({ 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' } as Record<string, string>)[file.type];
       task = uploadBytesResumable(ref(storage, `portfolio/${user.uid}/${crypto.randomUUID()}.${extension}`), file, { contentType: file.type });
-      task.on('state_changed', snapshot => { if (!disposed) setProgress(Math.round(snapshot.bytesTransferred / snapshot.totalBytes * 100)); });
+      timer = setTimeout(() => { stalled = true; task?.cancel(); }, 30000);
+      task.on('state_changed', snapshot => { if (snapshot.bytesTransferred > 0) clearTimeout(timer); if (!disposed) setProgress(Math.round(snapshot.bytesTransferred / snapshot.totalBytes * 100)); });
       const result = await task;
       const url = await getDownloadURL(result.ref);
       if (!disposed) { props.change(url); setMessage('Upload selesai. Simpan draf lalu Simpan & terbitkan agar tampil di website.'); }
     } catch (error) {
       if (!disposed) {
         const code = (error as { code?: string }).code;
-        setMessage(code === 'storage/unauthorized' ? 'Upload ditolak. Periksa Storage Rules dan akses admin.' : code === 'storage/canceled' ? 'Upload dibatalkan.' : 'Upload gagal. Pastikan Firebase Storage aktif dan aturan storage.rules sudah dipublikasikan. Coba lagi.');
+        setMessage(stalled ? 'Upload tidak mulai dalam 30 detik. Periksa koneksi, aktifkan Firebase Storage, dan pastikan nama bucket sesuai src/firebase.ts.' : code === 'storage/unauthorized' ? 'Upload ditolak. Periksa Storage Rules dan akses admin.' : code === 'storage/bucket-not-found' || code === 'storage/project-not-found' ? 'Bucket Storage belum tersedia. Buat bucket di Firebase Console dan cocokkan namanya dengan src/firebase.ts.' : code === 'storage/canceled' ? 'Upload dibatalkan.' : `Upload gagal (${code || 'koneksi'}). Periksa Firebase Storage, nama bucket, dan Storage Rules.`);
       }
-    } finally { task = undefined; release(); if (!disposed) setUploading(false); }
+    } finally { clearTimeout(timer); task = undefined; release(); if (!disposed) setUploading(false); }
   };
   return <span class="cms-upload">
     <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" aria-label="Upload gambar" disabled={uploading()} onChange={event => { const file = event.currentTarget.files?.[0]; event.currentTarget.value = ''; if (file) void upload(file); }}/>

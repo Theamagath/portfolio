@@ -15,4 +15,5 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 storage.maxUploadRetryTime = 60000;
+storage.maxOperationRetryTime = 15000;
 export const contentRef = doc(db, 'portfolio', 'main');
